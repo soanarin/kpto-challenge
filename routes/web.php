@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\KryptoController;
+use App\Http\Controllers\TripController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,4 +20,5 @@ Route::get('/', function () {
 });
 Route::get('/getalerts', [KryptoController::class, 'getAlerts']);
 Route::post('/postalerts', [KryptoController::class, 'postAlerts']);
+Route::post('/postOriginalTrips', [TripController::class, 'postOriginalTrips']);
 

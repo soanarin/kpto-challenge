@@ -2347,6 +2347,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+//
+//
 //
 //
 //
@@ -2386,14 +2394,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['list'],
+  props: ["list"],
+  data: function data() {
+    return {
+      file: ""
+    };
+  },
   methods: {
     view: function view(currencyId) {
       this.$router.push({
-        name: 'view',
+        name: "view",
         params: {
           currencyId: currencyId
         }
+      });
+    },
+    handleFileUpload: function handleFileUpload(event) {
+      this.file = this.$refs.file.files[0];
+    },
+    submitFile: function submitFile() {
+      var formData = new FormData(); // console.log(this.file);
+
+      formData.append("file", this.file);
+
+      var _iterator = _createForOfIteratorHelper(formData.entries()),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var key = _step.value;
+          console.log(key[0] + ', ' + key[1]);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      axios.post("/postOriginalTrips", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }).then(function () {
+        console.log("SUCCESS!!");
+      })["catch"](function () {
+        console.log("FAILURE!!");
       });
     }
   }
@@ -38798,61 +38843,93 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container mt-5" }, [
-    _c("div", { staticClass: "row justify-content-center" }, [
-      _c("div", { staticClass: "col-md-8" }, [
-        _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-header" }, [_vm._v("Currencies")]),
+  return _c(
+    "div",
+    { staticClass: "container mt-5" },
+    [
+      _c("example-component"),
+      _vm._v(" "),
+      _c("div", { staticClass: "container" }, [
+        _c("div", { staticClass: "large-12 medium-12 small-12 cell" }, [
+          _c("label", [
+            _vm._v("File\n        "),
+            _c("input", {
+              ref: "file",
+              attrs: { type: "file", id: "file" },
+              on: {
+                change: function($event) {
+                  return _vm.handleFileUpload()
+                }
+              }
+            })
+          ]),
           _vm._v(" "),
-          _c("div", { staticClass: "card-body" }, [
-            _c(
-              "div",
-              { staticClass: "container" },
-              [
-                _vm._m(0),
-                _vm._v(" "),
-                _vm._l(_vm.list, function(item) {
-                  return _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-sm" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(item.name) +
-                          "\n                            "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "col-sm" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(item.current_price) +
-                          " USD\n                            "
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "col-sm" }, [
-                      _c(
-                        "a",
-                        {
-                          attrs: { href: "#" },
-                          on: {
-                            click: function($event) {
-                              return _vm.view(item.id)
+          _c(
+            "button",
+            {
+              on: {
+                click: function($event) {
+                  return _vm.submitFile()
+                }
+              }
+            },
+            [_vm._v("Submit")]
+          )
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row justify-content-center" }, [
+        _c("div", { staticClass: "col-md-8" }, [
+          _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [_vm._v("Currencies")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c(
+                "div",
+                { staticClass: "container" },
+                [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _vm._l(_vm.list, function(item) {
+                    return _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-sm" }, [
+                        _vm._v(
+                          "\n                " +
+                            _vm._s(item.name) +
+                            "\n              "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm" }, [
+                        _vm._v(_vm._s(item.current_price) + " USD")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-sm" }, [
+                        _c(
+                          "a",
+                          {
+                            attrs: { href: "#" },
+                            on: {
+                              click: function($event) {
+                                return _vm.view(item.id)
+                              }
                             }
-                          }
-                        },
-                        [_vm._v("view")]
-                      )
+                          },
+                          [_vm._v("view")]
+                        )
+                      ])
                     ])
-                  ])
-                })
-              ],
-              2
-            )
+                  })
+                ],
+                2
+              )
+            ])
           ])
         ])
       ])
-    ])
-  ])
+    ],
+    1
+  )
 }
 var staticRenderFns = [
   function() {
@@ -38860,23 +38937,11 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-sm" }, [
-        _vm._v(
-          "\n                                Currency\n                            "
-        )
-      ]),
+      _c("div", { staticClass: "col-sm" }, [_vm._v("Currency")]),
       _vm._v(" "),
-      _c("div", { staticClass: "col-sm" }, [
-        _vm._v(
-          "\n                                Price\n                            "
-        )
-      ]),
+      _c("div", { staticClass: "col-sm" }, [_vm._v("Price")]),
       _vm._v(" "),
-      _c("div", { staticClass: "col-sm" }, [
-        _vm._v(
-          "\n                                Details\n                            "
-        )
-      ])
+      _c("div", { staticClass: "col-sm" }, [_vm._v("Details")])
     ])
   }
 ]
