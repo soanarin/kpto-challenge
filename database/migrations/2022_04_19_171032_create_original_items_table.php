@@ -44,10 +44,12 @@ class CreateOriginalItemsTable extends Migration
             $table->string('outbound_via_gateway')->nullable();
             $table->string('outbound_departure_time')->nullable();
             $table->string('outbound_arrival_time')->nullable();
+            $table->string('product_code')->nullable();
             $table->string('resort_departure_date')->nullable();
             $table->string('holiday_return_date')->nullable();
             $table->string('return_flight')->nullable();
             $table->string('return_departure_gateway')->nullable();
+            $table->string('return_arrival_gateway')->nullable();
             $table->string('return_via_gateway')->nullable();
             $table->string('return_departure_time')->nullable();
             $table->string('special_requests')->nullable();
@@ -55,6 +57,8 @@ class CreateOriginalItemsTable extends Migration
             $table->string('additional_info')->nullable();
             $table->string('skicar')->nullable();
             $table->string('package_info')->nullable();
+            $table->string('xref')->nullable();
+            $table->tinyInteger('processed')->default('0');
             $table->timestamps();
             $table->index('hash4');
         });
