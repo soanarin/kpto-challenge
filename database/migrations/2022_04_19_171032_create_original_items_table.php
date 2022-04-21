@@ -15,66 +15,49 @@ class CreateOriginalItemsTable extends Migration
     {
         Schema::create('original_trips', function (Blueprint $table) {
             $table->id();
-            $table->string('ref_person')->nullable();
+            $table->string('hash1')->nullable();
+            $table->string('hash2')->nullable();
+            $table->string('hash3')->nullable();
+            $table->string('hash4')->nullable();
             $table->string('booking_ref')->nullable();
+            $table->string('brand')->nullable();
+            $table->string('lead_title')->nullable();
             $table->string('lead_forename')->nullable();
             $table->string('lead_surname')->nullable();
             $table->string('pax')->nullable();
+            $table->string('infant_pax')->nullable();
             $table->string('holiday_arrival_date')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
-            // $table->string('name')->nullable();
+            $table->string('individual_name')->nullable();
+            $table->string('individual_age')->nullable();
+            $table->string('resort_arrival_date')->nullable();
+            $table->string('resort_name')->nullable();
+            $table->string('resort_region')->nullable();
+            $table->string('accom_name')->nullable();
+            $table->string('accom_duration')->nullable();
+            $table->string('stay_room_numbers')->nullable();
+            $table->string('room_number')->nullable();
+            $table->string('board_basis')->nullable();
+            $table->string('dietary_request')->nullable();
+            $table->string('outbound_flight')->nullable();
+            $table->string('outbound_departure_gateway')->nullable();
+            $table->string('outbound_arrival_gateway')->nullable();
+            $table->string('outbound_via_gateway')->nullable();
+            $table->string('outbound_departure_time')->nullable();
+            $table->string('outbound_arrival_time')->nullable();
+            $table->string('resort_departure_date')->nullable();
+            $table->string('holiday_return_date')->nullable();
+            $table->string('return_flight')->nullable();
+            $table->string('return_departure_gateway')->nullable();
+            $table->string('return_via_gateway')->nullable();
+            $table->string('return_departure_time')->nullable();
+            $table->string('special_requests')->nullable();
+            $table->string('private_transfer')->nullable();
+            $table->string('additional_info')->nullable();
+            $table->string('skicar')->nullable();
+            $table->string('package_info')->nullable();
             $table->timestamps();
+            $table->index('hash4');
         });
-
-        // {
-        //     ref_person: { type: String, default: 'none' },
-        //     Booking_Ref: { type: String, default: 'none' },
-        //     Brand_Name: { type: String, default: 'none' },
-        //     Lead_Title: { type: String, default: 'none' },
-        //     Lead_Forename: { type: String, default: 'none' },
-        //     Lead_Surname: { type: String, default: 'none' },
-        //     Pax: { type: String, default: 'none' },
-        //     Infant_Pax: { type: String, default: 'none' },
-        //     Holiday_Arrival_Date: { type: String, default: 'none' },
-        //     Individual_Name: { type: String, default: 'none' },
-        //     Individual_Age: { type: String, default: 'none' },
-        //     Resort_Arrival_Date: { type: String, default: 'none' },
-        //     Resort_Name: { type: String, default: 'none' },
-        //     Accom_Name: { type: String, default: 'none' },
-        //     Accom_Duration: { type: String, default: 'none' },
-        //     Stay_Room_Numbers: { type: String, default: 'none' },
-        //     Room_Number: { type: String, default: 'none' },
-        //     Board_Basis: { type: String, default: 'none' },
-        //     Dietary_Requirements: { type: String, default: 'none' },
-        //     Outbound_Flight: { type: String, default: 'none' },
-        //     Outbound_Departure_Gateway: { type: String, default: 'none' },
-        //     Outbound_Arrival_Gateway: { type: String, default: 'none' },
-        //     Outbound_Via_Gateway: { type: String, default: 'none' },
-        //     Outbound_Departure_Time: { type: String, default: 'none' },
-        //     Outbound_Arrival_Time: { type: String, default: 'none' },
-        //     Product_Code: { type: String, default: 'none' },
-        //     Resort_Departure_Date: { type: String, default: 'none' },
-        //     Holiday_Return_Date: { type: String, default: 'none' },
-        //     Return_Flight: { type: String, default: 'none' },
-        //     Return_Departure_Gateway: { type: String, default: 'none' },
-        //     Return_Arrival_Gateway: { type: String, default: 'none' },
-        //     Return_Via_Gateway: { type: String, default: 'none' },
-        //     Return_Departure_Time: { type: String, default: 'none' },
-        //     Special_Requests: { type: String, default: 'none' },
-        //     Private_Transfer: { type: String, default: 'none' },
-        //     Additional_Info: { type: String, default: 'none' },
-        //     SKICAR: { type: String, default: 'none' },
-        //     Package_Info: { type: String, default: 'none' },
-        //     Xref: { type: String, default: 'none' }
-        //   }
     }
 
     /**
@@ -84,6 +67,6 @@ class CreateOriginalItemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('original_items');
+        Schema::dropIfExists('original_trips');
     }
 }
