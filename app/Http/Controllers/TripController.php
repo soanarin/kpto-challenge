@@ -74,14 +74,27 @@ class TripController extends BaseController
                 //     // 'age' => $importData[5],
                 //     // 'salary' => $importData[6]
                 // ]);
-                DB::table('original_trips')->insert([
-                
+                $hash_original_trip = substr(md5(join([
+                    $importData[0],
+                    $importData[8],
+                    $importData[10],
+                    $importData[12],
+                    $importData[20],
+                    $importData[23],
+                    $importData[25],
+                    $importData[28],
+                    $importData[31],
+                    $importData[33],
+                ])), 0, 8);
 
-                    // 'hash1' => $importData[],
+                DB::table('original_trips')->insert([
+
+
+                    'hash1' => substr(md5($importData[0] . $importData[8]), 0, 8),
                     // 'hash2' => $importData[],
                     // 'hash3' => $importData[],
-                    // 'hash4' => $importData[],
-                    // 'resort_region' => $importData[],
+                    'hash4' => $hash_original_trip,
+                    'resort_region' => 'Como',
                     'booking_ref' => $importData[0],
                     'brand' => $importData[1],
                     'lead_title' => $importData[2],
