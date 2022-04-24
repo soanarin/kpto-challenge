@@ -8,6 +8,7 @@
           <input type="file"  id="file" ref="file" v-on:change="handleFileUpload()" />
         </label>
         <button v-on:click="submitFile()">Submit</button>
+
       </div>
     </div>
     <div class="row justify-content-center">

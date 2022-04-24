@@ -10,7 +10,8 @@ window.Vue = require('vue').default;
 
 import router from './router';
 import App from './layouts/App.vue';
-
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -23,6 +24,7 @@ import App from './layouts/App.vue';
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component('v-select', vSelect);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

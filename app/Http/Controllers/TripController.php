@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Trip;
+use App\Models\OriginalTrip;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\Controller as BaseController;
@@ -159,12 +160,70 @@ class TripController extends BaseController
                 //     DB::rollBack();
                 // }
             }
+            $this->processData();
             return response()->json([
                 'message' => "$j records successfully uploaded"
             ]);
         } else {
             //no file was uploaded
             throw new \Exception('No file was uploaded', Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function processData()
+    {
+        while (OriginalTrip::where('processed', 0)->exists()) {
+            $originalTrips = OriginalTrip::where('processed', 0)->limit('50')->get();
+            foreach ($originalTrips as $originalTrip) {
+                $originalTrip->processed = 1;
+                $originalTrip->save();
+                Trip::create([
+                    'origin1' => $originalTrip->outbound_arrival_gateway,
+                    'destination1' => $originalTrip->resort_region,
+                    'origin2' => $originalTrip->outbound_departure_gateway,
+                    'destination2' => $originalTrip->resort_name,
+                    'origin3' => $originalTrip->outbound_departure_gateway . '-' . $originalTrip->outbound_flight,
+                    'destination3' => $originalTrip->accom_name,
+                    'origin_date' => $originalTrip->resort_arrival_date,
+                    'destination_date' => $originalTrip->resort_arrival_date,
+                    'origin_time' => $originalTrip->outbound_arrival_time,
+                    // 'destination_time' => $originalTrip->x,
+                    // 'intermediate_origin' => $originalTrip->x,
+                    // 'intermediate_destination' => $originalTrip->x,
+                    // 'intermediate_origin_time' => $originalTrip->x,
+                    // 'intermediate_destination_time' => $originalTrip->x,
+                    // 'date' => $originalTrip->resort_arrival_date,
+                    'type' => 'flight_arrival',
+                    // 'transfer_nr' => $originalTrip->x,
+                    // 'checked_rep' => $originalTrip->x,
+                    // 'checked_driver' => $originalTrip->x,
+                    // 'checked_bus' => $originalTrip->x,
+                    'original_trip_hash4' => $originalTrip->hash4,
+                ]);
+                Trip::create([
+                    'origin1' => $originalTrip->resort_region,
+                    'destination1' =>  $originalTrip->return_departure_gateway,
+                    'origin2' => $originalTrip->resort_name,
+                    'destination2' => $originalTrip->return_arrival_gateway,
+                    'origin3' => $originalTrip->accom_name,
+                    'destination3' => $originalTrip->outbound_departure_gateway . '-' . $originalTrip->outbound_flight,
+                    'origin_date' => $originalTrip->resort_departure_date,
+                    'destination_date' => $originalTrip->resort_departure_date,
+                    // 'origin_time' => $originalTrip->outbound_arrival_time,
+                    'destination_time' => $originalTrip->return_departure_time,
+                    // 'intermediate_origin' => $originalTrip->x,
+                    // 'intermediate_destination' => $originalTrip->x,
+                    // 'intermediate_origin_time' => $originalTrip->x,
+                    // 'intermediate_destination_time' => $originalTrip->x,
+                    // 'date' => $originalTrip->resort_arrival_date,
+                    'type' => 'flight_departure',
+                    // 'transfer_nr' => $originalTrip->x,
+                    // 'checked_rep' => $originalTrip->x,
+                    // 'checked_driver' => $originalTrip->x,
+                    // 'checked_bus' => $originalTrip->x,
+                    'original_trip_hash4' => $originalTrip->hash4,
+                ]);
+            }
         }
     }
 
@@ -194,4 +253,84 @@ class TripController extends BaseController
     //         $message->subject($data['subject']);
     //     });
     // }
+
+    public function getTransferDates(Request $request)
+    {
+        $tripType = $request->input('type');
+        $nbDates = Trip::where('transfer_nr', null)
+            ->where('type', $tripType)->groupBy('origin_date')->pluck('origin_date');
+        $trDates = Trip::where('type', $tripType)->groupBy('origin_date')->pluck('origin_date');
+        $transferDates = [
+            'nonBusedDates' => $nbDates,
+            'allTransferDates' => $trDates
+        ];
+        file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($transferDates) . "\n", FILE_APPEND);
+        return response()->json([
+            'result' => $transferDates
+        ]);
+    }
+
+    public function getGatewaysByDateByType(Request $request)
+    {
+        // $tripType = $request->input('type');
+        // $transferDate = $request->input('transferDate');
+
+        $tripType = 'flight_arrival';
+        $tripType = 'flight_departure';
+        $transferDate = '08 Jun 2022';
+
+
+        if ($tripType == 'flight_arrival') {
+            $gateways = Trip::where('origin_date', $transferDate)->where('type', $tripType)->groupBy('origin1')->pluck('origin1');
+        } else {
+            $gateways = Trip::where('origin_date', $transferDate)->where('type', $tripType)->groupBy('destination1')->pluck('destination1');
+        }
+        return response()->json([
+            'result' => $gateways
+        ]);
+    }
+
+    public function getTripsForPlanning(Request $request)
+    {
+        $tripType = $request->input('type');
+        $transferDate = $request->input('transferDate');
+        $gateway = $request->input('gateway');
+
+        $tripType = 'flight_arrival';
+        // $tripType = 'flight_departure';
+        $transferDate = '01 Jun 2022';
+        $gateway = 'MXP';
+
+        if ($tripType == 'flight_arrival') {
+            $trips = Trip::where('origin_date', $transferDate)
+                ->where('origin1', $gateway)
+                ->select('origin3', 'destination1', 'transfer_nr', DB::raw('count(*) as total, ANY_VALUE(origin1) as origin1, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
+                ->groupBy('origin3')
+                ->groupBy('destination1')
+                ->groupBy('transfer_nr')
+                ->get();
+
+
+
+            // $trips = Trip::where('origin_date', $transferDate)
+            //     // ->addSelect(DB::raw('count(*) as total'))
+            //     ->selectRaw('ANY_VALUE(origin1)')
+            //     ->groupBy('origin3')
+            //     ->get();
+        } else {
+            $trips = Trip::where('origin_date', $transferDate)
+                ->where('destination1', $gateway)
+                ->select('destination3', 'origin1', 'transfer_nr', DB::raw('ANY_VALUE(destination1) as destination1, count(*) as total, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
+                ->groupBy('destination3')
+                ->groupBy('origin1')
+                ->groupBy('transfer_nr')
+                ->get();
+        }
+        return response()->json([
+            'result' => $trips
+        ]);
+        // return response()->json([
+        //     'result' => []
+        // ]);
+    }
 }

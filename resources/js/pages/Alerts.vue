@@ -1,6 +1,7 @@
 <template>
     <div class="container mt-5">
         <div class="row justify-content-center">
+            <v-select :options="['Canada', 'United States']"></v-select>
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Alert limits</div>
