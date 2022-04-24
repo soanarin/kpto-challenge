@@ -256,10 +256,15 @@ class TripController extends BaseController
 
     public function getTransferDates(Request $request)
     {
+$all = $request->all();
+file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
         $tripType = $request->input('type');
+        // $tripType = json_decode($tripType, true);
+        // $tripType = $tripType['transferType'];
+        file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($tripType) . "\n", FILE_APPEND);
         $nbDates = Trip::where('transfer_nr', null)
             ->where('type', $tripType)->groupBy('origin_date')->pluck('origin_date');
-        $trDates = Trip::where('type', $tripType)->groupBy('origin_date')->pluck('origin_date');
+        $trDates = Trip::where('type', $tripType)->orderBy('origin_date')->groupBy('origin_date')->pluck('origin_date');
         $transferDates = [
             'nonBusedDates' => $nbDates,
             'allTransferDates' => $trDates
@@ -272,12 +277,15 @@ class TripController extends BaseController
 
     public function getGatewaysByDateByType(Request $request)
     {
-        // $tripType = $request->input('type');
-        // $transferDate = $request->input('transferDate');
+        $all = $request->all();
+file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
 
-        $tripType = 'flight_arrival';
-        $tripType = 'flight_departure';
-        $transferDate = '08 Jun 2022';
+        $tripType = $request->input('type');
+        $transferDate = $request->input('transferDate');
+
+        // $tripType = 'flight_arrival';
+        // $tripType = 'flight_departure';
+        // $transferDate = '08 Jun 2022';
 
 
         if ($tripType == 'flight_arrival') {

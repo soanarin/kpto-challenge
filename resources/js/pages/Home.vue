@@ -5,10 +5,14 @@
       <div class="large-12 medium-12 small-12 cell">
         <label
           >File
-          <input type="file"  id="file" ref="file" v-on:change="handleFileUpload()" />
+          <input
+            type="file"
+            id="file"
+            ref="file"
+            v-on:change="handleFileUpload()"
+          />
         </label>
         <button v-on:click="submitFile()">Submit</button>
-
       </div>
     </div>
     <div class="row justify-content-center">
@@ -48,9 +52,9 @@ export default {
     };
   },
   methods: {
-    view(currencyId) {
-      this.$router.push({ name: "view", params: { currencyId: currencyId } });
-    },
+    // view(currencyId) {
+    //   this.$router.push({ name: "view", params: { currencyId: currencyId } });
+    // },
 
     handleFileUpload(event) {
       this.file = this.$refs.file.files[0];
@@ -58,12 +62,12 @@ export default {
 
     submitFile() {
       let formData = new FormData();
-// console.log(this.file);
+      // console.log(this.file);
 
       formData.append("file", this.file);
       for (var key of formData.entries()) {
-        console.log(key[0] + ', ' + key[1]);
-    }
+        console.log(key[0] + ", " + key[1]);
+      }
       axios
         .post("/postOriginalTrips", formData, {
           headers: {
@@ -71,10 +75,10 @@ export default {
           },
         })
         .then(function () {
-          console.log("SUCCESS!!");
+          console.log("SUCCESS!! postOriginalTrips");
         })
         .catch(function () {
-          console.log("FAILURE!!");
+          console.log("FAILURE!! postOriginalTrips");
         });
     },
   },

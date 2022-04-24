@@ -2395,6 +2395,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ["list"],
   data: function data() {
@@ -2403,14 +2407,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     };
   },
   methods: {
-    view: function view(currencyId) {
-      this.$router.push({
-        name: "view",
-        params: {
-          currencyId: currencyId
-        }
-      });
-    },
+    // view(currencyId) {
+    //   this.$router.push({ name: "view", params: { currencyId: currencyId } });
+    // },
     handleFileUpload: function handleFileUpload(event) {
       this.file = this.$refs.file.files[0];
     },
@@ -2425,7 +2424,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var key = _step.value;
-          console.log(key[0] + ', ' + key[1]);
+          console.log(key[0] + ", " + key[1]);
         }
       } catch (err) {
         _iterator.e(err);
@@ -2438,9 +2437,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           "Content-Type": "multipart/form-data"
         }
       }).then(function () {
-        console.log("SUCCESS!!");
+        console.log("SUCCESS!! postOriginalTrips");
       })["catch"](function () {
-        console.log("FAILURE!!");
+        console.log("FAILURE!! postOriginalTrips");
       });
     }
   }
@@ -2482,16 +2481,116 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['list'],
-  computed: {
-    currencyId: function currencyId() {
-      return this.$route.params.currencyId;
-    },
-    currency: function currency() {
-      return _.find(this.list, {
-        id: this.$route.params.currencyId
+  props: ["list"],
+  data: function data() {
+    return {
+      transferType: null,
+      transfer_types: [{
+        transferType: "flight_arrival",
+        typeLabel: "Arrival"
+      }, {
+        transferType: "flight_departure",
+        typeLabel: "Departure"
+      }],
+      transferDates: [],
+      transferDate: null,
+      gateways: [],
+      gateway: null,
+      trips: []
+    };
+  },
+  computed: {// currencyId() {
+    //   return this.$route.params.currencyId;
+    // },
+    // currency() {
+    //   return _.find(this.list, { id: this.$route.params.currencyId });
+    // },
+  },
+  methods: {
+    getTransferDates: function getTransferDates() {
+      var self = this;
+      axios.get("/getTransferDates", {
+        params: {
+          type: this.transferType.transferType
+        }
+      }).then(function (response) {
+        //   console.log(response);
+        console.log(response.data.result.allTransferDates); //   console.log(response.data.result.nonBusedDates);
+
+        self.transferDates = response.data.result.allTransferDates;
+      })["catch"](function (error) {
+        console.log("FAILURE!! getTransferDates");
+        console.log(error);
       });
+    },
+    getGateways: function getGateways() {
+      var self = this;
+      axios.get("/getGateways", {
+        params: {
+          type: this.transferType.transferType,
+          transferDate: this.transferDate
+        }
+      }).then(function (response) {
+        console.log(response); //   console.log(response.data.result.allTransferDates);
+        //   console.log(response.data.result.nonBusedDates);
+
+        self.gateways = response.data.result;
+      })["catch"](function (error) {
+        console.log("FAILURE!! getTransferGateways");
+        console.log(error);
+      });
+    },
+    getTripsPlanning: function getTripsPlanning() {
+      var self = this;
+      axios.get("/getTripsPlanning", {
+        params: {
+          type: this.transferType.transferType,
+          transferDate: this.transferDate,
+          gateway: this.gateway
+        }
+      }).then(function (response) {
+        console.log(response); //   console.log(response.data.result.allTransferDates);
+        //   console.log(response.data.result.nonBusedDates);
+
+        self.trips = response.data.result;
+      })["catch"](function (error) {
+        console.log("FAILURE!! getTripsPlanning");
+        console.log(error);
+      });
+    }
+  },
+  watch: {
+    transferType: function transferType(newValue, oldValue) {
+      this.getTransferDates();
+    },
+    transferDate: function transferDate(newValue, oldValue) {
+      this.getGateways();
+    },
+    gateway: function gateway(newValue, oldValue) {
+      this.getTripsPlanning();
     }
   }
 });
@@ -39396,65 +39495,85 @@ var render = function() {
     _c("div", { staticClass: "row justify-content-center" }, [
       _c(
         "div",
-        { staticClass: "col-md-8" },
+        { staticClass: "col-md-12" },
         [
-          _c("v-select", { attrs: { options: ["Canada", "United States"] } }),
+          _c("label", [_vm._v("Select type")]),
           _vm._v(" "),
-          _c("div", { staticClass: "card" }, [
-            _vm.currency !== undefined
-              ? _c("div", [
-                  _c("div", { staticClass: "card-header" }, [
-                    _vm._v(_vm._s(_vm.currency.name))
-                  ]),
-                  _vm._v(" "),
-                  _c("ul", [
-                    _c("li", [
-                      _vm._v(
-                        "Price >> " +
-                          _vm._s(_vm.currency.current_price) +
-                          " USD"
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("li", [
-                      _vm._v(
-                        "Last 24h >> " +
-                          _vm._s(_vm.currency.price_change_24h) +
-                          " USD, " +
-                          _vm._s(_vm.currency.price_change_percentage_24h) +
-                          " %"
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("li", [
-                      _vm._v(
-                        "Total market cap >> " + _vm._s(_vm.currency.market_cap)
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("li", [
-                      _vm._v(
-                        "Volume 24h >> " + _vm._s(_vm.currency.total_volume)
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("li", [
-                      _vm._v(
-                        "Circulating supply >> " +
-                          _vm._s(_vm.currency.circulating_supply)
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("li", [
-                      _vm._v(
-                        "Popularity on Kriptomat >> " +
-                          _vm._s(_vm.currency.market_cap_rank)
-                      )
-                    ])
-                  ])
+          _c("v-select", {
+            attrs: { label: "typeLabel", options: _vm.transfer_types },
+            model: {
+              value: _vm.transferType,
+              callback: function($$v) {
+                _vm.transferType = $$v
+              },
+              expression: "transferType"
+            }
+          }),
+          _vm._v(" "),
+          _c("label", [_vm._v("Select date")]),
+          _vm._v(" "),
+          _c("v-select", {
+            attrs: { options: _vm.transferDates },
+            model: {
+              value: _vm.transferDate,
+              callback: function($$v) {
+                _vm.transferDate = $$v
+              },
+              expression: "transferDate"
+            }
+          }),
+          _vm._v(" "),
+          _c("label", [_vm._v("Select gateway")]),
+          _vm._v(" "),
+          _c("v-select", {
+            attrs: { label: "typeLabel", options: _vm.gateways },
+            model: {
+              value: _vm.gateway,
+              callback: function($$v) {
+                _vm.gateway = $$v
+              },
+              expression: "gateway"
+            }
+          }),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "container" },
+            _vm._l(_vm.trips, function(trip) {
+              return _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-sm" }, [
+                  _vm._v(
+                    "\n            " + _vm._s(trip.transfer_nr) + "\n          "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm" }, [
+                  _vm._v(
+                    "\n            " + _vm._s(trip.origin_time) + "\n          "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm" }, [
+                  _vm._v(
+                    "\n            " + _vm._s(trip.origin3) + "\n          "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm" }, [
+                  _vm._v(
+                    "\n            " +
+                      _vm._s(trip.destination1) +
+                      "\n          "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm" }, [
+                  _vm._v("\n            " + _vm._s(trip.total) + "\n          ")
                 ])
-              : _vm._e()
-          ])
+              ])
+            }),
+            0
+          )
         ],
         1
       )
