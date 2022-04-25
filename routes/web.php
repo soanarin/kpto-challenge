@@ -24,6 +24,7 @@ Route::post('/postOriginalTrips', [TripController::class, 'postOriginalTrips']);
 Route::get('/getTransferDates', [TripController::class, 'getTransferDates']);
 Route::get('/getGateways', [TripController::class, 'getGatewaysByDateByType']);
 Route::get('/getTripsPlanning', [TripController::class, 'getTripsForPlanning']);
+Route::post('/assignBus', [TripController::class, 'postAssignBus']);
 
 
 

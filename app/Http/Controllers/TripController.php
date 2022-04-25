@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Trip;
+use App\Models\Bus;
 use App\Models\OriginalTrip;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -194,7 +195,7 @@ class TripController extends BaseController
                     // 'intermediate_destination_time' => $originalTrip->x,
                     // 'date' => $originalTrip->resort_arrival_date,
                     'type' => 'flight_arrival',
-                    // 'transfer_nr' => $originalTrip->x,
+                    // 'bus_id' => $originalTrip->x,
                     // 'checked_rep' => $originalTrip->x,
                     // 'checked_driver' => $originalTrip->x,
                     // 'checked_bus' => $originalTrip->x,
@@ -217,7 +218,7 @@ class TripController extends BaseController
                     // 'intermediate_destination_time' => $originalTrip->x,
                     // 'date' => $originalTrip->resort_arrival_date,
                     'type' => 'flight_departure',
-                    // 'transfer_nr' => $originalTrip->x,
+                    // 'bus_id' => $originalTrip->x,
                     // 'checked_rep' => $originalTrip->x,
                     // 'checked_driver' => $originalTrip->x,
                     // 'checked_bus' => $originalTrip->x,
@@ -256,13 +257,13 @@ class TripController extends BaseController
 
     public function getTransferDates(Request $request)
     {
-$all = $request->all();
-file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
+        $all = $request->all();
+        file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
         $tripType = $request->input('type');
         // $tripType = json_decode($tripType, true);
         // $tripType = $tripType['transferType'];
         file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($tripType) . "\n", FILE_APPEND);
-        $nbDates = Trip::where('transfer_nr', null)
+        $nbDates = Trip::where('bus_id', null)
             ->where('type', $tripType)->groupBy('origin_date')->pluck('origin_date');
         $trDates = Trip::where('type', $tripType)->orderBy('origin_date')->groupBy('origin_date')->pluck('origin_date');
         $transferDates = [
@@ -278,7 +279,7 @@ file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylo
     public function getGatewaysByDateByType(Request $request)
     {
         $all = $request->all();
-file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
+        file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($all) . "\n", FILE_APPEND);
 
         $tripType = $request->input('type');
         $transferDate = $request->input('transferDate');
@@ -312,10 +313,10 @@ file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylo
         if ($tripType == 'flight_arrival') {
             $trips = Trip::where('origin_date', $transferDate)
                 ->where('origin1', $gateway)
-                ->select('origin3', 'destination1', 'transfer_nr', DB::raw('count(*) as total, ANY_VALUE(origin1) as origin1, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
+                ->select('origin3', 'destination1', 'bus_id', DB::raw('count(*) as total, ANY_VALUE(origin1) as origin1, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
                 ->groupBy('origin3')
                 ->groupBy('destination1')
-                ->groupBy('transfer_nr')
+                ->groupBy('bus_id')
                 ->get();
 
 
@@ -328,10 +329,10 @@ file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylo
         } else {
             $trips = Trip::where('origin_date', $transferDate)
                 ->where('destination1', $gateway)
-                ->select('destination3', 'origin1', 'transfer_nr', DB::raw('ANY_VALUE(destination1) as destination1, count(*) as total, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
+                ->select('destination3', 'origin1', 'bus_id', DB::raw('ANY_VALUE(destination1) as destination1, count(*) as total, ANY_VALUE(origin_date) as origin_date, ANY_VALUE(origin_time) as origin_time'))
                 ->groupBy('destination3')
                 ->groupBy('origin1')
-                ->groupBy('transfer_nr')
+                ->groupBy('bus_id')
                 ->get();
         }
         return response()->json([
@@ -340,5 +341,26 @@ file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylo
         // return response()->json([
         //     'result' => []
         // ]);
+    }
+
+    public function postAssignBus(Request $request)
+    {
+        $params = $request->all();
+        $q1 = $params['origin_date'];
+        file_put_contents('/var/www/html/challenge-kriptomat/kriptomat/storage/logs/mylog.log', date("Y-m-d H:i:s ")  . " >>>" . json_encode($q1) . "\n", FILE_APPEND);
+        $bus =  Bus::create([
+            'identifier' => $params['busRef'],
+            'size' => $params['busSize'],
+            'supplier' => $params['busSupplier'],
+        ]);
+
+        Trip::where('origin_date', $params['origin_date'])
+        ->where('origin_date', $params['origin_date'])
+        ->where('origin3', $params['origin3'])
+        ->where('destination1', $params['destination1'])
+        ->update(['bus_id' => $bus->id]);
+        return response()->json([
+            'result' => ['success' => 1]
+        ]);
     }
 }

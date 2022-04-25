@@ -1,6 +1,20 @@
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
+      <div>
+        <b-button v-b-modal.modal-1>Launch demo modal</b-button>
+
+        <b-modal id="modal-1" title="Assign Bus">
+          <p class="my-4">Assign Bus</p>
+          <label>Bus ref</label>
+          <b-form-input v-model="bus.ref"></b-form-input>
+          <label>Bus size</label>
+          <b-form-input v-model="bus.size"></b-form-input>
+          <label>Supplier</label>
+          <b-form-input v-model="bus.supplier"></b-form-input>
+          <b-button @click="assignBus()"> Assign bus </b-button>
+        </b-modal>
+      </div>
       <div class="col-md-12">
         <label>Select type</label>
         <v-select
@@ -20,7 +34,7 @@
         <div class="container">
           <div class="row" v-for="trip in trips">
             <div class="col-sm">
-              {{ trip.transfer_nr }}
+              {{ trip.bus_id }}
             </div>
             <div class="col-sm">
               {{ trip.origin_time }}
@@ -31,13 +45,14 @@
             <div class="col-sm">
               {{ trip.destination1 }}
             </div>
-             <div class="col-sm">
-              {{ trip.total }}
+            <div class="col-sm">
+              <a href="#" @click="assignBus(trip)"> {{ trip.total }} </a>
+              <b-button v-b-modal.modal-1 @click="setTripForBus(trip)">
+                {{ trip.total }}
+              </b-button>
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
   </div>
@@ -64,6 +79,12 @@ export default {
       gateways: [],
       gateway: null,
       trips: [],
+      tripForBus: null,
+      bus: {
+        ref: null,
+        size: null,
+        supplier: null,
+      },
     };
   },
   computed: {
@@ -134,6 +155,38 @@ export default {
           console.log("FAILURE!! getTripsPlanning");
           console.log(error);
         });
+    },
+    assignBus() {
+      let self = this;
+      let trip = self.tripForBus;
+      console.log(self.tripForBus);
+      axios
+        .post("/assignBus", {
+          origin_date: trip.origin_date,
+          // origim_time: trip.origin_time,
+          destination1: trip.destination1,
+          origin3: trip.origin3,
+          total: trip.total,
+          busSize: self.bus.size,
+          busRef: self.bus.ref,
+          busSupplier: self.bus.supplier,
+        })
+        .then(function (response) {
+            console.log('...KKK');
+          self.$bvModal.hide('modal-1');
+          console.log(response);
+          self.getTripsPlanning();
+          //   console.log(response.data.result.allTransferDates);
+          //   console.log(response.data.result.nonBusedDates);
+          //   self.trips = response.data.result;
+        })
+        .catch(function (error) {
+          console.log("FAILURE!! getTripsPlanning");
+          console.log(error);
+        });
+    },
+    setTripForBus(trip) {
+      this.tripForBus = trip;
     },
   },
   watch: {

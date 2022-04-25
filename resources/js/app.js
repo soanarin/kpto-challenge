@@ -12,6 +12,15 @@ import router from './router';
 import App from './layouts/App.vue';
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+// Import Bootstrap and BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+// Make BootstrapVue available throughout your project
+Vue.use(BootstrapVue);
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
